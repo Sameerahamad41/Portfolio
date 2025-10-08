@@ -28,11 +28,11 @@ function firstPageAnim() {
     });
 }
 
-//Accordion and image hover logic
+// Accordion and image hover logic
 document.querySelectorAll('.accordion-item').forEach(item => {
     const header = item.querySelector('.accordion-header');
     const image = header.querySelector('img');
-    const icon = header.querySelector('i'); 
+    const icon = header.querySelector('i');
     let rotate = 0;
     let diffrot = 0;
 
@@ -48,7 +48,6 @@ document.querySelectorAll('.accordion-item').forEach(item => {
         }, 800);
     });
 
-    
     header.addEventListener('mouseleave', () => {
         gsap.to(image, {
             opacity: 0,
@@ -58,14 +57,8 @@ document.querySelectorAll('.accordion-item').forEach(item => {
     });
 
     header.addEventListener('mousemove', (dets) => {
-        if (dets.target === icon) {
-            gsap.to(image, {
-                opacity: 0,
-                ease: "power3.out",
-                duration: 0.5,
-            });
-            return; 
-        }
+        // This CSS-only fix is more reliable for the icon hover
+        // if (dets.target === icon) { ... }
         
         const rect = header.getBoundingClientRect();
         const diff = dets.clientY - rect.top;
@@ -82,8 +75,9 @@ document.querySelectorAll('.accordion-item').forEach(item => {
     });
 });
 
+// Update the live time in the footer
 function updateTime() {
-    const timeElement = document.querySelector('#time'); 
+    const timeElement = document.querySelector('#time');
     if (timeElement) {
         const now = new Date();
         const timeString = now.toLocaleTimeString('en-US', {
@@ -98,7 +92,7 @@ function updateTime() {
 setInterval(updateTime, 1000);
 updateTime();
 
-//Page view switch animation
+// Page view switch animation
 const mainContent = document.querySelector("#main-content");
 const contactPage = document.querySelector("#contact-page");
 const contactLink = document.querySelector("#contact-link");
@@ -114,12 +108,16 @@ function openContact() {
         onComplete: () => {
             mainContent.style.display = "none";
             contactPage.style.display = "flex";
-            if(scroll) scroll.destroy();
+            if (scroll) scroll.destroy();
+            
+            // *** ERROR FIX: Add the event listener only when the form is visible ***
+            const contactForm = document.querySelector('#contact-form-container form');
+            contactForm.addEventListener("submit", handleSubmit);
         }
     });
 
-    tl.fromTo(contactPage, 
-        { opacity: 0, y: 20 }, 
+    tl.fromTo(contactPage,
+        { opacity: 0, y: 20 },
         { opacity: 1, y: 0, duration: 0.8, ease: "power3.inOut" }
     );
 }
@@ -138,13 +136,13 @@ function closeContact() {
         }
     });
 
-    tl.fromTo(mainContent, 
-        { opacity: 0, y: -20 }, 
+    tl.fromTo(mainContent,
+        { opacity: 0, y: -20 },
         { opacity: 1, y: 0, duration: 0.8, ease: "power3.inOut" }
     );
 }
 
-// Add click event listeners
+// Add click event listeners for page switching
 contactLink.addEventListener("click", (event) => {
     event.preventDefault();
     openContact();
@@ -155,19 +153,19 @@ backToHomeLink.addEventListener("click", (event) => {
     closeContact();
 });
 
+// Run initial page load animation
 firstPageAnim();
 
-//Contact form
-const contactForm = document.querySelector('#contact-form-container form');
-
+// Contact form submission handler
 async function handleSubmit(event) {
-    event.preventDefault(); 
+    event.preventDefault();
+    const form = event.target;
     const status = document.createElement('p');
-    const data = new FormData(event.target);
-    
+    const data = new FormData(form);
+
     try {
-        const response = await fetch(event.target.action, {
-            method: contactForm.method,
+        const response = await fetch(form.action, {
+            method: form.method,
             body: data,
             headers: {
                 'Accept': 'application/json'
@@ -177,7 +175,7 @@ async function handleSubmit(event) {
         if (response.ok) {
             status.textContent = "Thanks for your message!";
             status.style.color = 'lightgreen';
-            contactForm.reset(); 
+            form.reset();
         } else {
             status.textContent = "Oops! There was a problem sending your message.";
             status.style.color = 'red';
@@ -186,11 +184,9 @@ async function handleSubmit(event) {
         status.textContent = "Oops! There was a problem sending your message.";
         status.style.color = 'red';
     }
-    
-    contactForm.appendChild(status);
+
+    form.appendChild(status);
     setTimeout(() => {
         status.remove();
-    }, 4000); 
+    }, 4000);
 }
-
-contactForm.addEventListener("submit", handleSubmit);
