@@ -25,6 +25,48 @@ body {
     color: white;
 }
 
+#page-wipe {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: white;
+  z-index: 999999;
+  transform: scaleY(0);
+  transform-origin: top;
+  pointer-events: none;
+}
+
+#project-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.9);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 999999;
+}
+
+.modal-content {
+  background: black;
+  color: white;
+  max-width: 600px;
+  padding: 40px;
+  border-radius: 12px;
+  position: relative;
+  transform: scale(0.8);
+  opacity: 0;
+}
+
+#close-modal {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 28px;
+  cursor: pointer;
+}
+
 #nav {
     padding: 20px 40px;
     display: flex;
@@ -1156,3 +1198,4 @@ body {
     }
 }
 }
+
